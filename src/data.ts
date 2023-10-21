@@ -47,20 +47,10 @@ export type earningStep = {
   percentage: number;
 };
 export const earningsRanges: earningStep[] = [
-  // {
-  //   start: 0,
-  //   end: 1849,
-  //   percentage: 0,
-  // },
   {
     start: 0,
-    end: 899,
-    percentage: 0,
-  },
-  {
-    start: 900,
     end: 1849,
-    percentage: 0.2,
+    percentage: 0,
   },
   {
     start: 1850,
