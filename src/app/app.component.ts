@@ -150,7 +150,7 @@ export class AppComponent implements OnInit {
             },
             value: {
               formatter: () => {
-                return ((this.nextStep?.start || 0) - this.amount).toString() + " zł";
+                return ((this.nextStep?.start || 0) - this.amount).toFixed(2).toString() + " zł";
               },
               color: "#111",
               fontSize: "36px",
