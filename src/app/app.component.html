@@ -1,12 +1,77 @@
-<div id="card">
-  <div id="chart">
-    <apx-chart
-      [series]="chartOptions.series"
-      [chart]="chartOptions.chart"
-      [plotOptions]="chartOptions.plotOptions"
-      [labels]="chartOptions.labels"
-      [stroke]="chartOptions.stroke"
-      [fill]="chartOptions.fill"
-    ></apx-chart>
+
+<!--
+Install the "flowbite-typography" NPM package to apply styles and format the article content:
+
+URL: https://flowbite.com/docs/components/typography/
+-->
+
+<main class="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-gray-900 antialiased">
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
+    <article class="mx-auto w-full max-w-2xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+      <div id="card">
+        <ng-container *ngIf="!chartOptions">
+
+          <div class="flex items-center justify-center w-full h-64 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mb-6">
+            <div class="px-3 py-1 text-xs font-medium leading-none text-center text-blue-800 bg-blue-200 rounded-full animate-pulse dark:bg-blue-900 dark:text-blue-200">loading...</div>
+          </div>
+
+        </ng-container>
+        <div id="chart" *ngIf="chartOptions">
+          <apx-chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [plotOptions]="chartOptions.plotOptions"
+            [labels]="chartOptions.labels"
+            [stroke]="chartOptions.stroke"
+            [fill]="chartOptions.fill"
+          ></apx-chart>
+        </div>
+      </div>
+
+      <div *ngIf="listOfAdditionalProfits.length">
+        <div class="flex items-center p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+          <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+          </svg>
+          <span class="sr-only">Info</span>
+          <div>
+            Teraz diagram pokazuje ile potrzebujecie zebrać żeby otrzymać kolejne nagrody. Powodzenia!
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="listOfAdditionalProfits.length" class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Lista zebranych punktów</h5>
+        </div>
+        <div class="flow-root">
+          <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+            <li *ngFor="let profit of listOfAdditionalProfits" class="py-3 sm:py-4">
+              <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-green-200 rounded-full text-green-600 flex items-center justify-center">
+                    CC
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                    Gratulacje!
+                  </p>
+                  <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                    Udało się zebrać nowe punkty.
+                  </p>
+                </div>
+                <div class="inline-flex items-center dark:text-white text-yellow-500 font-bold text-xl">
+                  + {{ profit.amount }} CC
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </article>
   </div>
-</div>
+</main>
+
+

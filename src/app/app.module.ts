@@ -3,6 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppComponent} from './app.component';
 import {NgApexchartsModule} from "ng-apexcharts";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -10,7 +11,8 @@ import {NgApexchartsModule} from "ng-apexcharts";
   ],
   imports: [
     BrowserModule,
-    NgApexchartsModule
+    NgApexchartsModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
