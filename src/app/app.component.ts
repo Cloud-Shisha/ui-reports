@@ -49,6 +49,9 @@ export class AppComponent implements OnInit {
 
   public readonly listOfAdditionalProfits: {
     amount: number;
+    percentage: number;
+    start: number;
+    end: number;
   }[] = [
     // {
     //   amount: 36
@@ -84,6 +87,7 @@ export class AppComponent implements OnInit {
   }
 
   private detectIfConfettiShouldBeShown(amount: number) {
+    const prevProfit = this.listOfAdditionalProfits[0];
     this.listOfAdditionalProfits.length = 0;
     const lastPassedStepIndex = this.stepsOfEarnings.findIndex((step) => amount >= step.start && amount <= step.end);
     const step = this.stepsOfEarnings[lastPassedStepIndex];
@@ -92,12 +96,17 @@ export class AppComponent implements OnInit {
         // ((4938.2*0.8)/100)/5.55
         // ((уторг * процент від дозоду)/100)/конфіціент додаткового дозоду
         amount: +(((amount * step.percentage) / 100) / percentageOfProfit).toFixed(2),
+        ...step
       });
       this.nextStep = this.stepsOfEarnings[lastPassedStepIndex + 1];
       if (!this.nextStep) {
         this.nextStep = step;
       }
-      this.confettiService.executeAsync().then();
+      if (!prevProfit) {
+        this.confettiService.executeAsync().then();
+      } else if (prevProfit.start !== step.start) {
+        this.confettiService.executeAsync().then();
+      }
     }
   }
 
