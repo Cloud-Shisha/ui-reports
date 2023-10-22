@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
   public chartOptions: ChartOptions | undefined;
 
   public readonly stepsOfEarnings: earningStep[] = [];
-  public showInfo = true;
+  public lastStepPassed = false;
 
   public readonly today = new Date();
 
@@ -55,7 +55,10 @@ export class AppComponent implements OnInit {
     end: number;
   }[] = [
     // {
-    //   amount: 36
+    //   amount: 36,
+    //   percentage: 2,
+    //   start: 0,
+    //   end: 1849,
     // }
   ]
   private nextStep: earningStep | undefined;
@@ -102,9 +105,9 @@ export class AppComponent implements OnInit {
       this.nextStep = this.stepsOfEarnings[lastPassedStepIndex + 1];
       if (!this.nextStep) {
         this.nextStep = step;
-        this.showInfo = false;
+        this.lastStepPassed = true;
       } else {
-        this.showInfo = true;
+        this.lastStepPassed = false;
       }
       if (!prevProfit) {
         this.confettiService.executeAsync().then();
