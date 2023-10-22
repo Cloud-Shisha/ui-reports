@@ -1,5 +1,4 @@
 import {Component, inject, OnInit, ViewChild} from "@angular/core";
-import JSConfetti from "js-confetti";
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -10,10 +9,13 @@ import {
   ChartComponent
 } from "ng-apexcharts";
 import {initFlowbite} from "flowbite";
-import {GetEarningsReportsPerHourApiAdapter} from "../api/adapter/get.earnings.reports.per.hour.api.adapter";
-import {map, tap} from "rxjs";
-import {earningsRanges, earningStep, percentageOfProfit, scheduleConfiguration} from "../data";
+import {earningsRanges, earningStep, percentageOfProfit, scheduleConfiguration, schedules} from "../data";
 import {WeekdaysEnum} from "../weekdays.enum";
+import {ConfettiService} from "../helper/confetti.service";
+import {CoreService} from "../core/service/core.service";
+import {filter} from "rxjs";
+import {is} from "thiis";
+import {ActivatedRoute} from "@angular/router";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries | ApexNonAxisChartSeries;
@@ -34,15 +36,16 @@ export class AppComponent implements OnInit {
   @ViewChild(ChartComponent)
   public chart: ChartComponent | undefined;
 
-  public chartOptions: ChartOptions | undefined;
+  public initialized = false;
 
-  public amount = 0;
+  private readonly confettiService = inject(ConfettiService);
+  private readonly coreService = inject(CoreService);
+
+  public chartOptions: ChartOptions | undefined;
 
   public readonly stepsOfEarnings: earningStep[] = []
 
   public readonly today = new Date();
-
-  private readonly getEarningsReportsPerHourApiAdapter = inject(GetEarningsReportsPerHourApiAdapter);
 
   public readonly listOfAdditionalProfits: {
     amount: number;
@@ -53,35 +56,79 @@ export class AppComponent implements OnInit {
   ]
   private nextStep: earningStep | undefined;
 
-  public ngOnInit() {
-    initFlowbite();
-    this.initStepsOfEarnings();
-    this.getEarningsReportsPerHourApiAdapter
-      .execute$()
-      .pipe(
-        map(({reports}) => reports[0].aggregate.sales.total_money.amount),
-        tap((amount) => this.amount = amount),
-        tap(this.detectIfConfettiShouldBeShown.bind(this)),
-      )
-      .subscribe(() => {
-        this.renderChart();
-      });
+  constructor() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let minusDays = +(urlParams.get('minusDays') || 0);
+    if (!minusDays) {
+      const scheduleIsFromYesterday = this.getSchedule().weekdayName !== this.today.toLocaleString("en", {weekday: "long"});
+      minusDays = scheduleIsFromYesterday ? 1 : 0;
+    }
+    this.today = this.coreService.setMinusDays(minusDays);
   }
 
-  private detectIfConfettiShouldBeShown() {
-    const lastPassedStepIndex = this.stepsOfEarnings.findIndex((step) => this.amount >= step.start && this.amount <= step.end);
+  public ngOnInit() {
+    initFlowbite();
+    this.coreService.initialize().then(() => {
+
+      this.coreService.amount$.pipe(filter(is.number)).subscribe((amount) => {
+
+        this.initStepsOfEarnings();
+        this.detectIfConfettiShouldBeShown(amount);
+        this.renderChart(amount);
+
+      });
+
+    });
+
+  }
+
+  private detectIfConfettiShouldBeShown(amount: number) {
+    this.listOfAdditionalProfits.length = 0;
+    const lastPassedStepIndex = this.stepsOfEarnings.findIndex((step) => amount >= step.start && amount <= step.end);
     const step = this.stepsOfEarnings[lastPassedStepIndex];
     if (lastPassedStepIndex > -1 && step.percentage > 0) {
       this.listOfAdditionalProfits.push({
-        amount: +((this.amount * (step.percentage / 100)) / percentageOfProfit).toFixed(2),
+        // ((4938.2*0.8)/100)/5.55
+        // ((уторг * процент від дозоду)/100)/конфіціент додаткового дозоду
+        amount: +(((amount * step.percentage) / 100) / percentageOfProfit).toFixed(2),
       });
       this.nextStep = this.stepsOfEarnings[lastPassedStepIndex + 1];
-      this.confetti();
+      this.confettiService.executeAsync().then();
     }
   }
 
+  private getSchedule(): {
+    weekdayName: WeekdaysEnum;
+    start: string;
+    end: string;
+  } {
+
+    const scheduleIndex = schedules.findIndex((schedule) => {
+      return schedule.weekdayName === this.today.toLocaleString("en", {weekday: "long"});
+    });
+
+    if (scheduleIndex === -1) {
+      throw new Error("Schedule not found");
+    }
+
+    const schedule = schedules[scheduleIndex];
+
+    if (schedule.start > this.today.getHours().toString()) {
+      const prevScheduleIndex = scheduleIndex - 1;
+      if (prevScheduleIndex === -1) {
+        return schedules[schedules.length - 1];
+      }
+      return schedules[prevScheduleIndex];
+    }
+
+    return schedule;
+  }
+
   private initStepsOfEarnings() {
-    const weekdayName = this.today.toLocaleString("en", {weekday: "long"}) as WeekdaysEnum.Friday | WeekdaysEnum.Saturday;
+
+    const schedule = this.getSchedule();
+    const weekdayName = schedule.weekdayName as WeekdaysEnum.Friday | WeekdaysEnum.Saturday;
+
     this.stepsOfEarnings.length = 0;
     this.stepsOfEarnings.push(...earningsRanges.map((earningStep) => {
       const foundConfiguration = scheduleConfiguration[weekdayName];
@@ -94,16 +141,18 @@ export class AppComponent implements OnInit {
       }
       return earningStep;
     }));
+
     this.nextStep = this.stepsOfEarnings[1];
   }
 
-  private renderChart() {
+  private renderChart(amount: number) {
 
-    const amount = this.amount;
     const firstStep = this.nextStep?.start || 0;
-    let serie = () => (amount * 100) / firstStep;
+    const sizePercentage = 70;
+    const percentage = +((amount / firstStep) * 100).toFixed(2);
+    const serieValue = percentage > 97 && percentage < 100 ? 97 : percentage;
     this.chartOptions = {
-      series: [serie()],
+      series: [serieValue],
       chart: {
         height: 350,
         type: "radialBar",
@@ -115,7 +164,7 @@ export class AppComponent implements OnInit {
         radialBar: {
           hollow: {
             margin: 0,
-            size: "70%",
+            size: `${sizePercentage}%`,
             background: "#fff",
             image: undefined,
             position: "front",
@@ -150,7 +199,7 @@ export class AppComponent implements OnInit {
             },
             value: {
               formatter: () => {
-                return ((this.nextStep?.start || 0) - this.amount).toFixed(2).toString() + " zł";
+                return ((this.nextStep?.start || 0) - amount).toFixed(2).toString() + " zł";
               },
               color: "#111",
               fontSize: "36px",
@@ -177,12 +226,9 @@ export class AppComponent implements OnInit {
       },
       labels: ["Jeszcze potrzebujecie"]
     };
-    // this.chart?.render();
+
+    this.initialized = true;
+
   }
 
-  private confetti() {
-    const jsConfetti = new JSConfetti();
-
-    jsConfetti.addConfetti().then();
-  }
 }

@@ -1,6 +1,6 @@
 import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {getEarningsReportsPerHour} from "../endpoint.api";
+import {EndpointApi} from "../endpoint.api";
 
 type response = {
   "dateRange": string;
@@ -39,12 +39,17 @@ type response = {
 @Injectable({
   providedIn: "root"
 })
-export class GetEarningsReportsPerHourApiAdapter {
+export class TodaysIncomeReportGetApiAdapter {
 
   private readonly httpClient = inject(HttpClient);
 
-  public execute$() {
-    return this.httpClient.get<response>(getEarningsReportsPerHour);
+  public execute$(access_token: string, minus_days = 0) {
+    return this.httpClient.get<response>(EndpointApi.GET_TODAYS_INCOME_REPORT, {
+      params: {
+        access_token,
+        minus_days
+      }
+    });
   }
 
 }

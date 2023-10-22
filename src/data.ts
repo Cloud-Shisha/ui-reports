@@ -1,37 +1,44 @@
 import {WeekdaysEnum} from "./weekdays.enum";
 
-export const schedule = {
-  [WeekdaysEnum.Monday]: {
+export const schedules = [
+  {
+    weekdayName: WeekdaysEnum.Monday,
     start: "12:00",
     end: "01:00",
   },
-  [WeekdaysEnum.Tuesday]: {
+  {
+    weekdayName: WeekdaysEnum.Tuesday,
     start: "12:00",
     end: "01:00",
   },
-  [WeekdaysEnum.Wednesday]: {
+  {
+    weekdayName: WeekdaysEnum.Wednesday,
     start: "12:00",
     end: "01:00",
   },
-  [WeekdaysEnum.Thursday]: {
+  {
+    weekdayName: WeekdaysEnum.Thursday,
     start: "12:00",
     end: "01:00",
   },
-  [WeekdaysEnum.Friday]: {
+  {
+    weekdayName: WeekdaysEnum.Friday,
     start: "12:00",
     end: "03:00",
   },
-  [WeekdaysEnum.Saturday]: {
+  {
+    weekdayName: WeekdaysEnum.Saturday,
     start: "14:00",
     end: "03:00",
   },
-  [WeekdaysEnum.Sunday]: {
+  {
+    weekdayName: WeekdaysEnum.Sunday,
     start: "14:00",
     end: "01:00",
   }
-};
+];
 
-export const percentageOfProfit = 5.5;
+export const percentageOfProfit = 5.55;
 export const scheduleConfiguration = {
   [WeekdaysEnum.Friday]: {
     upEndEarningsInTimes: 2, // earningsRanges[0].end * scheduleConfiguration[WeekdaysEnum.Friday].upEndEarningsInTimes (1849 * 2 = 3698)
