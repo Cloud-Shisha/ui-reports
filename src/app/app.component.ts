@@ -64,6 +64,7 @@ export class AppComponent implements OnInit {
       minusDays = scheduleIsFromYesterday ? 1 : 0;
     }
     this.today = this.coreService.setMinusDays(minusDays);
+    console.log("today:", this.today.toISOString());
   }
 
   public ngOnInit() {
@@ -93,6 +94,9 @@ export class AppComponent implements OnInit {
         amount: +(((amount * step.percentage) / 100) / percentageOfProfit).toFixed(2),
       });
       this.nextStep = this.stepsOfEarnings[lastPassedStepIndex + 1];
+      if (!this.nextStep) {
+        this.nextStep = step;
+      }
       this.confettiService.executeAsync().then();
     }
   }
@@ -151,6 +155,9 @@ export class AppComponent implements OnInit {
     const sizePercentage = 70;
     const percentage = +((amount / firstStep) * 100).toFixed(2);
     const serieValue = percentage > 97 && percentage < 100 ? 97 : percentage;
+
+    const result = (this.nextStep?.start || 0) - amount;
+
     this.chartOptions = {
       series: [serieValue],
       chart: {
@@ -199,10 +206,13 @@ export class AppComponent implements OnInit {
             },
             value: {
               formatter: () => {
-                return ((this.nextStep?.start || 0) - amount).toFixed(2).toString() + " zł";
+                if (result < 0) {
+                  return "Wszystkie nagrody!";
+                }
+                return result.toFixed(2).toString() + " zł";
               },
-              color: "#111",
-              fontSize: "36px",
+              color: result < 0 ? "green" : "#111",
+              fontSize: result < 0 ? "20px" : "36px",
               show: true
             }
           }
@@ -224,7 +234,7 @@ export class AppComponent implements OnInit {
       stroke: {
         lineCap: "round"
       },
-      labels: ["Jeszcze potrzebujecie"]
+      labels: result < 0 ? ["Gratulacje! Macie:"] : ["Jeszcze potrzebujecie"]
     };
 
     this.initialized = true;
