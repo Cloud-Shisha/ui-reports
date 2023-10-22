@@ -103,6 +103,8 @@ export class AppComponent implements OnInit {
       if (!this.nextStep) {
         this.nextStep = step;
         this.showInfo = false;
+      } else {
+        this.showInfo = true;
       }
       if (!prevProfit) {
         this.confettiService.executeAsync().then();
