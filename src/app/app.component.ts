@@ -102,7 +102,7 @@ export class AppComponent implements OnInit {
   private pushMotivationText() {
     setTimeout(() => {
 
-      typeAndClearMessage(getRandomMotivationText(), 70, 35, 3_000).then(() => {
+      typeAndClearMessage(getRandomMotivationText(), 70, 35, 600_000).then(() => {
         this.pushMotivationText();
       });
 
