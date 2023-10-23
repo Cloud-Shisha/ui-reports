@@ -12,7 +12,7 @@ export class CoreService {
   private readonly todaysIncomeReportGetApiAdapter = inject(TodaysIncomeReportGetApiAdapter);
 
   #amount$ = new BehaviorSubject<null | number>(null);
-  private timeoutToAutoRefreshAmount = (1000 * 60) * 10; // 10 minutes
+  private timeoutToAutoRefreshAmount = (1000 * 60); // 1 minutes
   // private timeoutToAutoRefreshAmount = 20_000; // 10 minutes
 
   public readonly amount$ = this.#amount$.asObservable();
