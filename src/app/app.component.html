@@ -37,20 +37,21 @@ URL: https://flowbite.com/docs/components/typography/
       </div>
 
       <div *ngIf="listOfAdditionalProfits.length && !lastStepPassed">
-        <div class="flex items-center p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
-          <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-          </svg>
-          <span class="sr-only">Info</span>
-          <div>
-            Teraz diagram pokazuje ile potrzebujecie zebrać żeby otrzymać kolejne nagrody. Powodzenia!
-          </div>
+        <div class="flex items-center gap-2 p-4 mb-4 h-16 text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+          <span class="text-2xl">🤑</span>
+          <div class="font-bold" id="message"></div>
         </div>
       </div>
 
       <div *ngIf="listOfAdditionalProfits.length" class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col gap-3 items-start justify-center mb-4">
           <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Zebrane punkty</h5>
+          <p class="text-neutral-500 text-sm flex items-center">
+            <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            </svg>
+            Teraz diagram pokazuje ile potrzebujecie zebrać żeby otrzymać kolejne nagrody. Powodzenia!
+          </p>
         </div>
         <div class="flow-root">
           <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">

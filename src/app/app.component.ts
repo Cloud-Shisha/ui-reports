@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, inject, OnInit, ViewChild} from "@angular/core";
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -15,7 +15,8 @@ import {ConfettiService} from "../helper/confetti.service";
 import {CoreService} from "../core/service/core.service";
 import {filter} from "rxjs";
 import {is} from "thiis";
-import {ActivatedRoute} from "@angular/router";
+import {getRandomMotivationText} from "../motivates";
+import {typeAndClearMessage} from "../tools";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries | ApexNonAxisChartSeries;
@@ -60,7 +61,8 @@ export class AppComponent implements OnInit {
     //   start: 0,
     //   end: 1849,
     // }
-  ]
+  ];
+
   private nextStep: earningStep | undefined;
 
   constructor() {
@@ -74,11 +76,18 @@ export class AppComponent implements OnInit {
     console.log("today:", this.today.toISOString());
   }
 
+
   public ngOnInit() {
     initFlowbite();
     this.coreService.initialize().then(() => {
 
       this.coreService.amount$.pipe(filter(is.number)).subscribe((amount) => {
+
+        if (!this.initialized) {
+
+          this.pushMotivationText();
+
+        }
 
         this.initStepsOfEarnings();
         this.detectIfConfettiShouldBeShown(amount);
@@ -88,6 +97,16 @@ export class AppComponent implements OnInit {
 
     });
 
+  }
+
+  private pushMotivationText() {
+    setTimeout(() => {
+
+      typeAndClearMessage(getRandomMotivationText(), 70, 35, 3_000).then(() => {
+        this.pushMotivationText();
+      });
+
+    }, 250);
   }
 
   private detectIfConfettiShouldBeShown(amount: number) {
@@ -258,3 +277,5 @@ export class AppComponent implements OnInit {
   }
 
 }
+
+
