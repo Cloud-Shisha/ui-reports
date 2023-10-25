@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, inject, OnInit, ViewChild} from "@angular/core";
+import {Component, inject, OnInit, ViewChild} from "@angular/core";
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -47,7 +47,9 @@ export class AppComponent implements OnInit {
   public readonly stepsOfEarnings: earningStep[] = [];
   public lastStepPassed = false;
 
-  public readonly today = new Date();
+  public today = new Date();
+  public minusDays = 0;
+  public schedule = this.getSchedule();
 
   public readonly listOfAdditionalProfits: {
     amount: number;
@@ -66,14 +68,22 @@ export class AppComponent implements OnInit {
   private nextStep: earningStep | undefined;
 
   constructor() {
-    const urlParams = new URLSearchParams(window.location.search);
-    let minusDays = +(urlParams.get('minusDays') || 0);
-    if (!minusDays) {
-      const scheduleIsFromYesterday = this.getSchedule().weekdayName !== this.today.toLocaleString("en", {weekday: "long"});
-      minusDays = scheduleIsFromYesterday ? 1 : 0;
-    }
-    this.today = this.coreService.setMinusDays(minusDays);
+    setTimeout(() => {
+      window.location.reload();
+    }, 12 * 60 * 60 * 1000);
+    this.initMinusDays();
     console.log("today:", this.today.toISOString());
+  }
+
+  private initMinusDays() {
+    this.schedule = this.getSchedule();
+    const urlParams = new URLSearchParams(window.location.search);
+    this.minusDays = +(urlParams.get('minusDays') || 0);
+    if (!this.minusDays) {
+      const scheduleIsFromYesterday = this.schedule.weekdayName !== this.today.toLocaleString("en", {weekday: "long"});
+      this.minusDays = scheduleIsFromYesterday ? 1 : 0;
+    }
+    this.today = this.coreService.setMinusDays(this.minusDays);
   }
 
 
@@ -92,6 +102,7 @@ export class AppComponent implements OnInit {
         this.initStepsOfEarnings();
         this.detectIfConfettiShouldBeShown(amount);
         this.renderChart(amount);
+        this.initMinusDays();
 
       });
 
@@ -165,8 +176,7 @@ export class AppComponent implements OnInit {
 
   private initStepsOfEarnings() {
 
-    const schedule = this.getSchedule();
-    const weekdayName = schedule.weekdayName as WeekdaysEnum.Friday | WeekdaysEnum.Saturday;
+    const weekdayName = this.schedule.weekdayName as WeekdaysEnum.Friday | WeekdaysEnum.Saturday;
 
     this.stepsOfEarnings.length = 0;
     this.stepsOfEarnings.push(...earningsRanges.map((earningStep) => {
