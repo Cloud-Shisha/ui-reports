@@ -72,7 +72,6 @@ export class AppComponent implements OnInit {
       window.location.reload();
     }, 12 * 60 * 60 * 1000);
     this.initMinusDays();
-    console.log("today:", this.today.toISOString());
   }
 
   private initMinusDays() {
@@ -84,6 +83,7 @@ export class AppComponent implements OnInit {
       this.minusDays = scheduleIsFromYesterday ? 1 : 0;
     }
     this.today = this.coreService.setMinusDays(this.minusDays);
+    console.log("today:", this.today.toISOString());
   }
 
 
@@ -163,7 +163,8 @@ export class AppComponent implements OnInit {
 
     const schedule = schedules[scheduleIndex];
 
-    if (schedule.start > this.today.getHours().toString()) {
+    const todayTIme = `${this.today.getHours().toString()}:${this.today.getMinutes().toString()}`;
+    if (schedule.start > todayTIme) {
       const prevScheduleIndex = scheduleIndex - 1;
       if (prevScheduleIndex === -1) {
         return schedules[schedules.length - 1];
