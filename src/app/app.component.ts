@@ -49,6 +49,7 @@ export class AppComponent implements OnInit {
 
   public today = new Date();
   public minusDays = 0;
+  public weSeeYesterdayBecauseNewScheduleIsNotReady = false;
   public schedule = this.getSchedule();
 
   public readonly listOfAdditionalProfits: {
@@ -153,6 +154,7 @@ export class AppComponent implements OnInit {
     end: string;
   } {
 
+    // Saturday 00:30 so we should see Friday schedule
     const scheduleIndex = schedules.findIndex((schedule) => {
       return schedule.weekdayName === this.today.toLocaleString("en", {weekday: "long"});
     });
@@ -165,6 +167,7 @@ export class AppComponent implements OnInit {
 
     const todayTIme = `${this.today.getHours().toString()}:${this.today.getMinutes().toString()}`;
     if (schedule.start > todayTIme) {
+      this.weSeeYesterdayBecauseNewScheduleIsNotReady = true;
       const prevScheduleIndex = scheduleIndex - 1;
       if (prevScheduleIndex === -1) {
         return schedules[schedules.length - 1];
