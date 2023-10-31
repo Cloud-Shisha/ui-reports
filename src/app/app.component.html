@@ -43,11 +43,11 @@ URL: https://flowbite.com/docs/components/typography/
         </div>
       </div>
 
-      <div *ngIf="minusDays !== 0 && !weSeeYesterdayBecauseNewScheduleIsNotReady">
+      <div *ngIf="minusDays !== 0 && weSeeYesterdayBecauseNewScheduleIsNotReady">
         <div class="flex items-center gap-2 p-4 mb-4 min-h-16 text-orange-800 rounded-lg bg-orange-100 dark:bg-gray-800 dark:text-orange-400" role="alert">
           <span class="text-2xl">🗓️</span>
           <div class="font-bold">
-            Widzisz dane z wczoraj. Dane z dzisiaj będą dostępne od godziny: {{ schedule.start }}.
+            Widzisz dane z wczoraj. Dane z dzisiaj będą dostępne od godziny: {{ nextSchedule.start }}.
           </div>
         </div>
       </div>

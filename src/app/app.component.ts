@@ -51,6 +51,7 @@ export class AppComponent implements OnInit {
   public minusDays = 0;
   public weSeeYesterdayBecauseNewScheduleIsNotReady = false;
   public schedule = this.getSchedule();
+  public nextSchedule = this.getSchedule(false);
 
   public readonly listOfAdditionalProfits: {
     amount: number;
@@ -128,9 +129,9 @@ export class AppComponent implements OnInit {
     const step = this.stepsOfEarnings[lastPassedStepIndex];
     if (lastPassedStepIndex > -1 && step.percentage > 0) {
       this.listOfAdditionalProfits.push({
-        // ((4938.2*0.8)/100)/5.55
+        // 1963*(0.3/100)/5.55 = 1.06
         // ((уторг * процент від дозоду)/100)/конфіціент додаткового дозоду
-        amount: +(((amount * step.percentage) / 100) / percentageOfProfit).toFixed(2),
+        amount: +((amount * (step.percentage / 100)) / percentageOfProfit).toFixed(2),
         ...step
       });
       this.nextStep = this.stepsOfEarnings[lastPassedStepIndex + 1];
@@ -148,7 +149,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  private getSchedule(): {
+  private getSchedule(checkToday = true): {
     weekdayName: WeekdaysEnum;
     start: string;
     end: string;
@@ -165,14 +166,16 @@ export class AppComponent implements OnInit {
 
     const schedule = schedules[scheduleIndex];
 
-    const todayTIme = `${this.today.getHours().toString()}:${this.today.getMinutes().toString()}`;
-    if (schedule.start > todayTIme) {
-      this.weSeeYesterdayBecauseNewScheduleIsNotReady = true;
-      const prevScheduleIndex = scheduleIndex - 1;
-      if (prevScheduleIndex === -1) {
-        return schedules[schedules.length - 1];
+    if (checkToday) {
+      const todayTIme = `${this.today.getHours().toString().padStart(2, '0')}:${this.today.getMinutes().toString()}`;
+      if (schedule.start > todayTIme) {
+        this.weSeeYesterdayBecauseNewScheduleIsNotReady = true;
+        const prevScheduleIndex = scheduleIndex - 1;
+        if (prevScheduleIndex === -1) {
+          return schedules[schedules.length - 1];
+        }
+        return schedules[prevScheduleIndex];
       }
-      return schedules[prevScheduleIndex];
     }
 
     return schedule;
