@@ -11,12 +11,12 @@ import {
 import {initFlowbite} from "flowbite";
 import {earningsRanges, earningStep, percentageOfProfit, scheduleConfiguration, schedules} from "../data";
 import {WeekdaysEnum} from "../weekdays.enum";
-import {ConfettiService} from "../helper/confetti.service";
 import {CoreService} from "../core/service/core.service";
 import {filter} from "rxjs";
 import {is} from "thiis";
 import {getRandomMotivationText} from "../motivates";
 import {typeAndClearMessage} from "../tools";
+import {EffectHelper} from "../helper/effect.helper";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries | ApexNonAxisChartSeries;
@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
 
   public initialized = false;
 
-  private readonly confettiService = inject(ConfettiService);
+  private readonly effectHelper = inject(EffectHelper);
   private readonly coreService = inject(CoreService);
 
   public chartOptions: ChartOptions | undefined;
@@ -142,9 +142,9 @@ export class AppComponent implements OnInit {
         this.lastStepPassed = false;
       }
       if (!prevProfit) {
-        this.confettiService.executeAsync().then();
+        this.effectHelper.executeAsync();
       } else if (prevProfit.start !== step.start) {
-        this.confettiService.executeAsync().then();
+        this.effectHelper.executeAsync();
       }
     }
   }
