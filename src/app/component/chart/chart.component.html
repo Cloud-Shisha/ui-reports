@@ -1,0 +1,21 @@
+<ng-container *ngIf="!chartOptions">
+
+  <div
+    class="flex items-center justify-center w-full h-64 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mb-6">
+    <div
+      class="px-3 py-1 text-xs font-medium leading-none text-center text-blue-800 bg-blue-200 rounded-full animate-pulse dark:bg-blue-900 dark:text-blue-200">
+      loading...
+    </div>
+  </div>
+
+</ng-container>
+<div id="chart" *ngIf="chartOptions">
+  <apx-chart
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [plotOptions]="chartOptions.plotOptions"
+    [labels]="chartOptions.labels"
+    [stroke]="chartOptions.stroke"
+    [fill]="chartOptions.fill"
+  ></apx-chart>
+</div>

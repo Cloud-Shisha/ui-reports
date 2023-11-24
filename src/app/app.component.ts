@@ -1,13 +1,4 @@
-import {Component, inject, OnInit, ViewChild} from "@angular/core";
-import {
-  ApexAxisChartSeries,
-  ApexChart,
-  ApexFill,
-  ApexNonAxisChartSeries,
-  ApexPlotOptions,
-  ApexStroke,
-  ChartComponent
-} from "ng-apexcharts";
+import {Component, inject, OnInit, ViewEncapsulation} from "@angular/core";
 import {initFlowbite} from "flowbite";
 import {earningsRanges, earningStep, percentageOfProfit, scheduleConfiguration, schedules} from "../data";
 import {WeekdaysEnum} from "../weekdays.enum";
@@ -17,32 +8,21 @@ import {is} from "thiis";
 import {getRandomMotivationText} from "../motivates";
 import {typeAndClearMessage} from "../tools";
 import {EffectHelper} from "../helper/effect.helper";
-
-export type ChartOptions = {
-  series: ApexAxisChartSeries | ApexNonAxisChartSeries;
-  chart: ApexChart;
-  labels: string[];
-  plotOptions: ApexPlotOptions;
-  fill: ApexFill;
-  stroke: ApexStroke;
-};
+import {ChartService} from "./component/chart/chart.service";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.scss"]
+  encapsulation: ViewEncapsulation.None,
+  providers: [
+    ChartService
+  ]
 })
 export class AppComponent implements OnInit {
 
-  @ViewChild(ChartComponent)
-  public chart: ChartComponent | undefined;
-
-  public initialized = false;
-
   private readonly effectHelper = inject(EffectHelper);
   private readonly coreService = inject(CoreService);
-
-  public chartOptions: ChartOptions | undefined;
+  private readonly chartService = inject(ChartService);
 
   public readonly stepsOfEarnings: earningStep[] = [];
   public lastStepPassed = false;
@@ -66,8 +46,6 @@ export class AppComponent implements OnInit {
     //   end: 1849,
     // }
   ];
-
-  private nextStep: earningStep | undefined;
 
   constructor() {
     setTimeout(() => {
@@ -95,7 +73,7 @@ export class AppComponent implements OnInit {
 
       this.coreService.amount$.pipe(filter(is.number)).subscribe((amount) => {
 
-        if (!this.initialized) {
+        if (!this.chartService.initialized) {
 
           this.pushMotivationText();
 
@@ -103,7 +81,7 @@ export class AppComponent implements OnInit {
 
         this.initStepsOfEarnings();
         this.detectIfConfettiShouldBeShown(amount);
-        this.renderChart(amount);
+        this.chartService.amount$.next(amount);
         this.initMinusDays();
 
       });
@@ -134,9 +112,9 @@ export class AppComponent implements OnInit {
         amount: +((amount * (step.percentage / 100)) / percentageOfProfit).toFixed(2),
         ...step
       });
-      this.nextStep = this.stepsOfEarnings[lastPassedStepIndex + 1];
-      if (!this.nextStep) {
-        this.nextStep = step;
+      this.chartService.nextStep = this.stepsOfEarnings[lastPassedStepIndex + 1];
+      if (!this.chartService.nextStep) {
+        this.chartService.nextStep = step;
         this.lastStepPassed = true;
       } else {
         this.lastStepPassed = false;
@@ -198,99 +176,7 @@ export class AppComponent implements OnInit {
       return earningStep;
     }));
 
-    this.nextStep = this.stepsOfEarnings[1];
-  }
-
-  private renderChart(amount: number) {
-
-    const firstStep = this.nextStep?.start || 0;
-    const sizePercentage = 70;
-    const percentage = +((amount / firstStep) * 100).toFixed(2);
-    const serieValue = percentage > 97 && percentage < 100 ? 97 : percentage;
-
-    const result = (this.nextStep?.start || 0) - amount;
-
-    this.chartOptions = {
-      series: [serieValue],
-      chart: {
-        height: 350,
-        type: "radialBar",
-        toolbar: {
-          show: true
-        }
-      },
-      plotOptions: {
-        radialBar: {
-          hollow: {
-            margin: 0,
-            size: `${sizePercentage}%`,
-            background: "#fff",
-            image: undefined,
-            position: "front",
-            dropShadow: {
-              enabled: true,
-              top: 3,
-              left: 0,
-              blur: 4,
-              opacity: 0.24
-            }
-          },
-          track: {
-            background: "#fff",
-            strokeWidth: "67%",
-            margin: 0, // margin is in pixels
-            dropShadow: {
-              enabled: true,
-              top: -3,
-              left: 0,
-              blur: 4,
-              opacity: 0.35
-            }
-          },
-
-          dataLabels: {
-            show: true,
-            name: {
-              offsetY: -10,
-              show: true,
-              color: "#888",
-              fontSize: "17px",
-            },
-            value: {
-              formatter: () => {
-                if (result < 0) {
-                  return "Wszystkie nagrody!";
-                }
-                return result.toFixed(2).toString() + " zł";
-              },
-              color: result < 0 ? "green" : "#111",
-              fontSize: result < 0 ? "20px" : "36px",
-              show: true
-            }
-          }
-        }
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          shade: "dark",
-          type: "horizontal",
-          shadeIntensity: 0.5,
-          gradientToColors: ["#ABE5A1"],
-          inverseColors: true,
-          opacityFrom: 1,
-          opacityTo: 1,
-          stops: [0, 100]
-        }
-      },
-      stroke: {
-        lineCap: "round"
-      },
-      labels: result < 0 ? ["Gratulacje! Macie:"] : ["Jeszcze potrzebujecie"]
-    };
-
-    this.initialized = true;
-
+    this.chartService.nextStep = this.stepsOfEarnings[1];
   }
 
 }
