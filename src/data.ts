@@ -1,6 +1,8 @@
 import {WeekdaysEnum} from "./weekdays.enum";
+import {IEarningStep} from "./interface/i.earning-step";
+import {ISchedule, IScheduleConfiguration, IScheduleConfigurationByWeekday} from "./interface/i.schedule";
 
-export const schedules = [
+export const schedules: ISchedule[] = [
   {
     weekdayName: WeekdaysEnum.Monday,
     start: "12:00",
@@ -38,27 +40,38 @@ export const schedules = [
   }
 ];
 
-export const percentageOfProfit = 5.55;
-export const scheduleConfiguration = {
+
+export const scheduleConfigurations: IScheduleConfigurationByWeekday = {
+  [WeekdaysEnum.Monday]: {
+    upEarningsInTimes: 1,
+  },
+  [WeekdaysEnum.Tuesday]: {
+    upEarningsInTimes: 1,
+  },
+  [WeekdaysEnum.Wednesday]: {
+    upEarningsInTimes: 1,
+  },
+  [WeekdaysEnum.Thursday]: {
+    upEarningsInTimes: 1,
+  },
   [WeekdaysEnum.Friday]: {
-    upEndEarningsInTimes: 2, // earningsRanges[0].end * scheduleConfiguration[WeekdaysEnum.Friday].upEndEarningsInTimes (1849 * 2 = 3698)
+    upEarningsInTimes: 2, // earningsRanges[0].end * scheduleConfiguration[WeekdaysEnum.Friday].upEndEarningsInTimes (1849 * 2 = 3698)
   },
   [WeekdaysEnum.Saturday]: {
-    upEndEarningsInTimes: 2,
-  }
+    upEarningsInTimes: 2,
+  },
+  [WeekdaysEnum.Sunday]: {
+    upEarningsInTimes: 1,
+  },
 };
 
-export type earningStep = {
-  start: number;
-  end: number;
-  percentage: number;
-};
-export const earningsRanges: earningStep[] = [
-  {
-    start: 0,
-    end: 1849,
-    percentage: 0,
-  },
+
+export const earningsRanges: IEarningStep[] = [
+  // {
+  //   start: 0,
+  //   end: 1849,
+  //   percentage: 0,
+  // },
   {
     start: 1850,
     end: 2099,

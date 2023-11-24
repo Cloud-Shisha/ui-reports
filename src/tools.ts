@@ -1,3 +1,5 @@
+import {getRandomMotivationText} from "./motivates";
+
 export function typeAndClearMessage(message: string, delay: number, delayClear?: number, waiteBeforeClear:number = 0): Promise<void> {
   return new Promise<void>((resolve) => {
     const messageElement = document.getElementById("message"); // Replace "message" with the ID of your message container
@@ -32,4 +34,14 @@ export function typeAndClearMessage(message: string, delay: number, delayClear?:
 
     typeText(0).then();
   });
+}
+
+export function initMessageWithAutoUpdate() {
+  setTimeout(() => {
+
+    typeAndClearMessage(getRandomMotivationText(), 70, 35, 600_000).then(() => {
+      initMessageWithAutoUpdate();
+    });
+
+  }, 250);
 }

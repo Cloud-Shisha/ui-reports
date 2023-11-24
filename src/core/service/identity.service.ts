@@ -3,6 +3,7 @@ import {firstValueFrom, map, tap} from "rxjs";
 import {TodaysIncomeReportGetApiAdapter} from "../../api/adapter/todays-income-report.get.api.adapter";
 import {AccessTokenPostApiAdapter} from "../../api/adapter/access-token.post.api.adapter";
 import {RefreshTokenPostApiAdapter} from "../../api/adapter/refresh-token.post.api.adapter";
+import {NGXLogger} from "ngx-logger";
 
 type identity = {
   access_token: string;
@@ -18,6 +19,7 @@ type identity = {
 })
 export class IdentityService {
 
+  private readonly ngxLogger = inject(NGXLogger);
   private readonly accessTokenPostApiAdapter = inject(AccessTokenPostApiAdapter);
   private readonly refreshTokenPostApiAdapter = inject(RefreshTokenPostApiAdapter);
 
@@ -31,25 +33,25 @@ export class IdentityService {
   }
 
   public initialize() {
-
+    this.ngxLogger.info("IdentityService:initialize");
     return this.initializeAccessToken();
-
   }
 
   private async initializeAccessToken() {
 
+    this.ngxLogger.info("IdentityService:initializeAccessToken");
     let identity = JSON.parse(this.#storage.getItem("identity") || "null");
 
     if (identity) {
-      console.log("Identity found in storage", identity)
+      this.ngxLogger.info("IdentityService:initializeAccessToken:identity found in storage", identity);
       if (identity.expires_at < new Date().getTime()) {
-        console.log("Identity expired", identity);
+        this.ngxLogger.info("IdentityService:initializeAccessToken:identity is expired");
         identity = null;
       }
     }
 
     if (!identity) {
-      console.log("Trying to get new identity");
+      this.ngxLogger.info("IdentityService:initializeAccessToken:identity is null");
       identity = await firstValueFrom(this.accessTokenPostApiAdapter.execute$());
       identity = this.saveIdentity(identity);
     }
@@ -69,13 +71,13 @@ export class IdentityService {
       this.refreshAccessToken().then();
     }, restTimeToRefreshToken);
 
-    console.log("Identity initialized and autoRefreshToken too", identity, restTimeToRefreshToken);
+    this.ngxLogger.info("IdentityService:initializeData", identity, restTimeToRefreshToken);
 
   }
 
   private async refreshAccessToken() {
     if (!this.#refreshToken) {
-      console.error("Refresh token is not defined");
+      this.ngxLogger.error("Refresh token is not defined");
       return;
     }
     const response = await firstValueFrom(this.refreshTokenPostApiAdapter.execute$(this.#refreshToken));
@@ -90,7 +92,7 @@ export class IdentityService {
       expires_at: new Date().getTime() + identity.expires_in * 1000
     };
     this.#storage.setItem("identity", JSON.stringify(newIdentity));
-    console.log("Identity saved", newIdentity);
+    this.ngxLogger.info("Identity saved", newIdentity);
     return newIdentity;
 
   }

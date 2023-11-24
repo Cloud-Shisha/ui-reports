@@ -2,11 +2,14 @@ import {inject, Injectable} from "@angular/core";
 import {BehaviorSubject, map, tap} from "rxjs";
 import {TodaysIncomeReportGetApiAdapter} from "../../api/adapter/todays-income-report.get.api.adapter";
 import {IdentityService} from "./identity.service";
+import {NGXLogger} from "ngx-logger";
 
 @Injectable({
   providedIn: "root"
 })
 export class CoreService {
+
+  private readonly ngxLogger = inject(NGXLogger);
 
   private readonly identityService = inject(IdentityService);
   private readonly todaysIncomeReportGetApiAdapter = inject(TodaysIncomeReportGetApiAdapter);
@@ -22,11 +25,13 @@ export class CoreService {
     this.#minusDays = minusDays;
     const date = new Date();
     date.setDate(date.getDate() - minusDays);
-    console.log("minusDays:", minusDays, "date:", date.toISOString());
+    this.ngxLogger.info("CoreService:setMinusDays", {minusDays, date});
     return date;
   }
 
   public async initialize() {
+
+    this.ngxLogger.info("CoreService:initialize");
 
     await this.identityService.initialize();
     const accessToken = this.identityService.accessToken;
@@ -37,8 +42,10 @@ export class CoreService {
 
   private initializeAmount(accessToken: string | undefined) {
 
+    this.ngxLogger.info("CoreService:initializeAmount");
+
     if (!accessToken) {
-      console.error("Access token is not defined");
+      this.ngxLogger.error("CoreService:accessToken is undefined");
       return;
     }
 
@@ -55,6 +62,8 @@ export class CoreService {
   }
 
   private initializeAutoRefreshAmount() {
+
+    this.ngxLogger.info("CoreService:initializeAutoRefreshAmount");
 
     setTimeout(() => {
       this.initializeAmount(this.identityService.accessToken);
