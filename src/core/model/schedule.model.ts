@@ -26,6 +26,10 @@ export class ScheduleModel {
   }
 
   public get currentScheduleIsFromYesterday() {
+    if (!this.scheduleDate) {
+      console.error("scheduleDate is not defined");
+      return false;
+    }
     return this.scheduleDate.hasSame(this.today.minus({days: 1}), "day");
   }
 
@@ -104,22 +108,30 @@ export class ScheduleModel {
     const weekdayLong = this.today.weekdayLong;
     // Find schedule by weekday
     const schedule = schedules.find((schedule) => schedule.weekdayName === weekdayLong);
+
     // Check if found schedule is valid
     if (!schedule) {
       this.scheduleDidNotFound = true;
       return this;
     }
+
+    const start = this.today.startOf('day').plus({
+      hours: DateTime.fromISO(schedule.start).hour,
+      minutes: DateTime.fromISO(schedule.start).minute,
+    });
+    const end = this.today.startOf('day').plus({
+      hours: DateTime.fromISO(schedule.end).hour,
+      minutes: DateTime.fromISO(schedule.end).minute,
+    });
+
     // Check if schedule is valid for today
-    if (schedule.start > this.today.toFormat("HH:mm")) {
+    if (start > this.today) {
       // If not, use previous schedule
       this.scheduleDate = this.today.minus({days: 1});
       return this;
     }
-    let end = schedule.end;
-    if (schedule.end < schedule.start) {
-      end = "23:59";
-    }
-    if (end < this.today.toFormat("HH:mm")) {
+
+    if (end < this.today) {
       this.scheduleDidNotFound = true;
       return this;
     }
