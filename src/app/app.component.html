@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <div *ngIf="currentScheduleIsFromYesterday">
+      <div *ngIf="!isScheduleStillValid">
         <div
           class="flex items-center gap-2 p-4 mb-4 min-h-16 text-orange-800 rounded-lg bg-orange-100 dark:bg-gray-800 dark:text-orange-400"
           role="alert">

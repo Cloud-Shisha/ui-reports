@@ -54,6 +54,10 @@ export class AppComponent implements OnInit, AfterContentInit {
     return this.businessCalculationModel.getFullEarningsStepsAchieved();
   }
 
+  public get isScheduleStillValid() {
+    return this.scheduleModel.isScheduleStillValid;
+  }
+
   public get currentScheduleIsFromYesterday() {
     return this.scheduleModel.currentScheduleIsFromYesterday;
   }
@@ -81,7 +85,12 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   public ngOnInit() {
     initFlowbite();
+    if (this.currentScheduleIsFromYesterday) {
+      this.coreService.setMinusDays(1);
+    }
     this.coreService.initialize().then(() => {
+
+      console.log(this.isScheduleStillValid);
 
       this.coreService.amount$.pipe(filter(is.number)).subscribe((amount) => {
 

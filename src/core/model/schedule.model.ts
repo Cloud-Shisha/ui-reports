@@ -33,6 +33,20 @@ export class ScheduleModel {
     return this.scheduleDate.hasSame(this.today.minus({days: 1}), "day");
   }
 
+  public get isScheduleStillValid() {
+    if (!this.scheduleDate) {
+      console.error("isScheduleStillValid:scheduleDate is not defined");
+      return false;
+    }
+    if (!this.currentSchedule) {
+      console.error("isScheduleStillValid:currentSchedule is not defined");
+      return false;
+    }
+
+    const {start, end} = this.getScheduleStartAndEnd(this.scheduleDate, this.currentSchedule);
+    return this.scheduleDate >= start && this.scheduleDate <= end;
+  }
+
   private initScheduleConfiguration() {
     if (!this.scheduleDate) {
       console.error("scheduleDate is not defined");
@@ -115,19 +129,20 @@ export class ScheduleModel {
       return this;
     }
 
-    const start = this.today.startOf('day').plus({
-      hours: DateTime.fromISO(schedule.start).hour,
-      minutes: DateTime.fromISO(schedule.start).minute,
-    });
-    const end = this.today.startOf('day').plus({
-      hours: DateTime.fromISO(schedule.end).hour,
-      minutes: DateTime.fromISO(schedule.end).minute,
-    });
+    const {start, end} = this.getScheduleStartAndEnd(this.today, schedule);
 
     // Check if schedule is valid for today
     if (start > this.today) {
-      // If not, use previous schedule
-      this.scheduleDate = this.today.minus({days: 1});
+      // Get previous schedule
+      const yesterday = this.today.minus({days: 1});
+      const previousSchedule = schedules.find((schedule) => schedule.weekdayName === yesterday.weekdayLong);
+      if (!previousSchedule) {
+        this.scheduleDidNotFound = true;
+        return this;
+      }
+      // Check if previous schedule is valid for today
+      const {start, end} = this.getScheduleStartAndEnd(yesterday, previousSchedule);
+      this.scheduleDate = start;
       return this;
     }
 
@@ -138,6 +153,26 @@ export class ScheduleModel {
     // If yes, use today schedule
     this.scheduleDate = this.today;
     return this;
+  }
+
+  private getScheduleStartAndEnd(scheduleDate: DateTime, schedule: ISchedule,) {
+
+    const start = scheduleDate.startOf('day').plus({
+      hours: DateTime.fromISO(schedule.start).hour,
+      minutes: DateTime.fromISO(schedule.start).minute,
+    });
+
+    let end = scheduleDate.startOf('day').plus({
+      hours: DateTime.fromISO(schedule.end).hour,
+      minutes: DateTime.fromISO(schedule.end).minute,
+    });
+
+    if (start > end) {
+      end = end.plus({days: 1});
+    }
+
+    return {start, end};
+
   }
 
 
