@@ -42,7 +42,7 @@ export class BusinessCalculationModel {
 
       const step: IAchievedEarningStep = {
         ...earningRange,
-        achieved: amount >= earningRange.start && amount <= earningRange.end,
+        achieved: amount >= earningRange.start,
       };
 
       this.achievedEarningSteps.push(step);
