@@ -52,7 +52,7 @@ export class ScheduleModel {
       console.error("scheduleDate is not defined");
       return this;
     }
-    const weekdayLong = this.scheduleDate.weekdayLong;
+    const weekdayLong = this.scheduleDate.setLocale('en').weekdayLong;
     if (!weekdayLong) {
       console.error("weekdayLong is not defined");
       return this;
@@ -77,7 +77,7 @@ export class ScheduleModel {
       console.error("scheduleDidNotFound is true");
       return this;
     }
-    const weekdayLong = this.scheduleDate.weekdayLong;
+    const weekdayLong = this.scheduleDate.setLocale('en').weekdayLong;
     const schedule = schedules.find((schedule) => schedule.weekdayName === weekdayLong);
     if (!schedule) {
       console.error("schedule is not defined");
@@ -98,7 +98,7 @@ export class ScheduleModel {
       console.error("scheduleDidNotFound is true");
       return this;
     }
-    const weekdayLong = this.scheduleDate.plus({day: 1}).weekdayLong;
+    const weekdayLong = this.scheduleDate.plus({day: 1}).setLocale('en').weekdayLong;
     const schedule = schedules.find((schedule) => schedule.weekdayName === weekdayLong);
     if (!schedule) {
       console.error("schedule is not defined");
@@ -119,7 +119,7 @@ export class ScheduleModel {
       return this;
     }
 
-    const weekdayLong = this.today.weekdayLong;
+    const weekdayLong = this.today.setLocale('en').weekdayLong;
     // Find schedule by weekday
     const schedule = schedules.find((schedule) => schedule.weekdayName === weekdayLong);
 
@@ -135,7 +135,7 @@ export class ScheduleModel {
     if (start > this.today) {
       // Get previous schedule
       const yesterday = this.today.minus({days: 1});
-      const previousSchedule = schedules.find((schedule) => schedule.weekdayName === yesterday.weekdayLong);
+      const previousSchedule = schedules.find((schedule) => schedule.weekdayName === yesterday.setLocale('en').weekdayLong);
       if (!previousSchedule) {
         this.scheduleDidNotFound = true;
         return this;
