@@ -52,7 +52,7 @@ export class CoreService {
     this.todaysIncomeReportGetApiAdapter
       .execute$(accessToken, this.#minusDays)
       .pipe(
-        map(({reports}) => reports[0].aggregate.sales.total_money.amount),
+        map(({data}) => data[0].total_amount.amount),
         tap((amount) => this.#amount$.next(amount)),
       )
       .subscribe(() => {
